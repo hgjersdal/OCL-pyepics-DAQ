@@ -2,17 +2,13 @@
 import os
 os.environ["PYEPICS_LIBCA"] = "/home/dev/git/ng3e/root/R3.15.4/base/lib/linux-x86_64/libca.so"
 
-import epics
-import time
-import numpy
-import warnings 
+import epics, time, numpy, warnings, sys
 
-# Supress CA warnings about identical variable names
+# Supress CA warnings. Currently it is spamming due to "Identical process variable names on multiple servers"
 supressEpicsWarings = True
 if(supressEpicsWarings):
     def handleMessages(text):
-        if(text.find("Identical process variable names on multiple servers") > 0):
-            sys,stderr.write(text)
+        None
     epics.ca.replace_printf_handler(handleMessages)
 
 pvConfig = {
