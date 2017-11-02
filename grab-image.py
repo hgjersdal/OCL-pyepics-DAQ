@@ -15,8 +15,7 @@ pvConfig = {
     'CAM1:image1:EnableCallbacks': 1,#Enable
     'CAM1:image1:ArrayCallbacks': 1, #Enable
     'CAM1:det1:ImageMode': 0, #Get a single image
-    'CAM1:det1:DataType': 1,  #UInt16, 12-bit
-    'CAM1:det1:typo': 1  #typo
+    'CAM1:det1:DataType': 1  #UInt16, 12-bit
 }
 
 def caputDict(dict):
@@ -39,13 +38,21 @@ def acquireImage():
     time.sleep(0.1)
     while (epics.caget('CAM1:det1:DetectorState_RBV') != 0):
         time.sleep(0.1)
-    return( epics.caget('CAM1:image1:ArrayData') )
+    return( epics.caget('CAM1:image1:ArrayData').astype(numpy.uint16))
 
-caputAndCheckDict(pvConfig)
-setExposure(0.01, 0)
-raw = acquireImage()
-image = raw.reshape(epics.caget('CAM1:det1:SizeY_RBV'), epics.caget('CAM1:det1:SizeX_RBV'))
-import matplotlib.pyplot as plt
-plt.matshow(image)
-plt.show()
+def printImageToScreen():
+    caputAndCheckDict(pvConfig)
+    setExposure(0.03, 0)
+    raw = acquireImage()
+    print(str(min(raw)) + ", " + str(max(raw)))
+    image = raw.reshape(epics.caget('CAM1:det1:SizeY_RBV'), epics.caget('CAM1:det1:SizeX_RBV'))
+    import matplotlib.pyplot as plt
+    plt.matshow(image)
+    plt.colorbar()
+    plt.show()
 
+def saveImageToHDF5():
+    None
+
+
+printImageToScreen()
