@@ -11,12 +11,26 @@ if(supressEpicsWarings):
         None
     epics.ca.replace_printf_handler(handleMessages)
 
-pvConfig = {
+imageOnScreenConfig = {
     'CAM1:image1:EnableCallbacks': 1,#Enable
     'CAM1:image1:ArrayCallbacks': 1, #Enable
     'CAM1:det1:ImageMode': 0, #Get a single image
     'CAM1:det1:DataType': 1  #UInt16, 12-bit
 }
+
+imageToHDF5Config = {
+    'CAM1:image1:EnableCallbacks': 1,#Enable
+    'CAM1:image1:ArrayCallbacks': 1, #Enable
+    'CAM1:det1:ImageMode': 0, #Get a single image
+    'CAM1:det1:DataType': 1,  #UInt16, 12-bit
+    'CAM1:HDF1:EnableCallbacks': 1, #Enable
+    'CAM1:HDF1:AutoIncrement': 1, #Enable
+    'CAM1:HDF1:NumDataBits': 16, #16 bit pixels
+    'CAM1:HDF1:FileWriteMode': 0, #Single
+    'CAM1:HDF1:NumCapture': 1, #Capture one image
+}
+
+
 
 def caputDict(dict):
     for key, value in dict.iteritems():
@@ -41,7 +55,7 @@ def acquireImage():
     return( epics.caget('CAM1:image1:ArrayData').astype(numpy.uint16))
 
 def printImageToScreen():
-    caputAndCheckDict(pvConfig)
+    caputAndCheckDict(imageOnScreenConfig)
     setExposure(0.03, 0)
     raw = acquireImage()
     print(str(min(raw)) + ", " + str(max(raw)))
@@ -51,8 +65,14 @@ def printImageToScreen():
     plt.colorbar()
     plt.show()
 
-def saveImageToHDF5():
-    None
+def saveImageToHDF5(pathname, basename):
+    caputAndCheckDict(imageToHDF5Config)
+    epics.caput('CAM1:HDF1:FilePath', pathname)
+    epics.caput('CAM1:HDF1:FileName', basename)
+    epics.caput('CAM1:HDF1:FileTemplate', '%s%s_%3.3d.h5')
+    acquireImage()
+    epics.caput('CAM1:HDF1:WriteFile', 1)
+    
 
-
-printImageToScreen()
+#printImageToScreen()
+saveImageToHDF5('/tmp/', 'pytest')
