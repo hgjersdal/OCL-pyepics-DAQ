@@ -9,11 +9,6 @@ imageOnScreenConfig = {
 }
 
 imageToHDF5Config = {
-    'CAM1:image1:EnableCallbacks': 1,#Enable
-    'CAM1:image1:ArrayCallbacks': 1, #Enable
-    'CAM1:det1:ImageMode': 0, #Get a single image
-    'CAM1:det1:DataType': 1,  #UInt16, 12-bit
-    'CAM1:det1:LEFTSHIFT': 0, #Disable
     'CAM1:HDF1:EnableCallbacks': 1, #Enable
     'CAM1:HDF1:AutoIncrement': 1, #Enable
     'CAM1:HDF1:NumDataBits': 16, #16 bit pixels
@@ -22,8 +17,7 @@ imageToHDF5Config = {
     'CAM1:HDF1:FileTemplate': '%s%s_%3.3d.h5' # path + basename + imagecounter + '.h5'
 }
 
-def getCalibration():
-    
+imageToHDF5Config = dict( imageOnScreenConfig.items() + imageToHDF5Config.items() )
 
 def setExposure(exposure, gain):
     grabData.caputAndCheckDict({'CAM1:det1:AcquireTime': exposure, 'CAM1:det1:Gain': gain})

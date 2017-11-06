@@ -1,7 +1,7 @@
 import grabData, time, numpy, epics
 
 #Spectra
-spectrumToScreen = {
+spectrumToScreenConfig = {
     'CCS1:det1:ImageMode': 0,#Single
     'CCS1:det1:TlAcquisitionType': 1, #Processed, set to 0 for raw
     'CCS1:det1:TriggerMode': 0, #Internal
@@ -10,6 +10,17 @@ spectrumToScreen = {
     'CCS1:det1:TlAmplitudeDataTarget': 2, #Thorlabs
     'CCS1:det1:TlWavelengthDataTarget': 1, #Factory
 }
+
+spectrumToHDF5Config =  {
+    'CCS1:HDF1:EnableCallbacks': 1, #Enable
+    'CCS1:HDF1:AutoIncrement': 1, #Enable
+    'CCS1:HDF1:FileWriteMode': 0, #Single
+    'CCS1:HDF1:NumCapture': 1, #Capture one image
+    'CCS1:HDF1:FileTemplate': '%s%s_%3.3d.h5' # path + basename + imagecounter + '.h5'
+}
+
+
+spectrumToHDF5Config = dict( spectrumToScreenConfig.items() + spectrumToHDF5Config.items() )
 
 def calibrationData():
     """ Get calibration data """
@@ -37,6 +48,17 @@ def printSpectrumToScreen():
     plt.plot(waves[0:shortLength], amplitudes[0:shortLength])
     plt.show()
 
+def saveSpectrumToHDF5(pathname, basename):
+    grabData.caputAndCheckDict(spectrumToHDF5Config)
+    grabData.caputDict({
+        'CCS1:HDF1:FilePath': pathname,
+        'CCS1:HDF1:FileName': basename
+    })
+    acquireSpectrum()
+    epics.caput('CCS1:HDF1:WriteFile', 1)
+
+
 calibrationData()
 setExposure(0.1)
-printSpectrumToScreen()
+#printSpectrumToScreen()
+saveSpectrumToHDF5('/tmp/', 'ccstest')
