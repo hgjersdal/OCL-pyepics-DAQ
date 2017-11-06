@@ -23,3 +23,10 @@ def caputAndCheckDict(dict):
         if( (type(rbv) != numpy.ndarray ) and (rbv != value) ):
             warnings.warn( key + " is set to " + str(value) + ", but RBV is " + str(rbv))
 
+def acquireData(baseString, dataString):
+    caputDict({ baseString + 'Acquire': 1})
+    time.sleep(0.1)
+    while (epics.caget( baseString + 'DetectorState_RBV' ) != 0):
+        time.sleep(0.1)
+    return(epics.caget( dataString ))
+
