@@ -3,7 +3,7 @@ import grabData, time, numpy, epics
 #Spectra
 spectrumToScreenConfig = {
     'CCS1:det1:ImageMode': 0,#Single
-    'CCS1:det1:TlAcquisitionType': 1, #Processed, set to 0 for raw
+    'CCS1:det1:TlAcquisitionType': 1, #1 is processed, set to 0 for raw
     'CCS1:det1:TriggerMode': 0, #Internal
     'CCS1:trace1:EnableCallbacks': 1, #Enable
     'CCS1:trace1:ArrayCallbacks': 1, #Enable
@@ -18,7 +18,6 @@ spectrumToHDF5Config =  {
     'CCS1:HDF1:NumCapture': 1, #Capture one image
     'CCS1:HDF1:FileTemplate': '%s%s_%3.3d.h5' # path + basename + imagecounter + '.h5'
 }
-
 
 spectrumToHDF5Config = dict( spectrumToScreenConfig.items() + spectrumToHDF5Config.items() )
 
@@ -48,17 +47,22 @@ def printSpectrumToScreen():
     plt.plot(waves[0:shortLength], amplitudes[0:shortLength])
     plt.show()
 
-def saveSpectrumToHDF5(pathname, basename):
+def spectrumToHDF5(h5f, path, nSpectra):
+    import h5py
+    calibrationData()
     grabData.caputAndCheckDict(spectrumToHDF5Config)
-    grabData.caputDict({
-        'CCS1:HDF1:FilePath': pathname,
-        'CCS1:HDF1:FileName': basename
-    })
-    acquireSpectrum()
-    epics.caput('CCS1:HDF1:WriteFile', 1)
+    for n in range(nSpectra):
+        raw = acquireSpectrum()
+        h5f.create_dataset( path + '/spectrum' + str(n), data = raw[0])
+    waves =  epics.caget('CCS1:det1:TlWavelengthData_RBV')
+    h5f.create_dataset( path + 'wavelengths', data = waves)
+    amplitudes =  epics.caget('CCS1:det1:TlAmplitudeData_RBV')
+    h5f.create_dataset( path + 'amplitudedata', data = amplitudes)
+    grabData.setAttributes(h5f, path, 
+                           {'exposure': epics.caget('CCS1:det1:AcquireTime_RBV'),
+                           })
 
-
-calibrationData()
-setExposure(0.1)
+#calibrationData()
+#setExposure(0.1)
 #printSpectrumToScreen()
-saveSpectrumToHDF5('/tmp/', 'ccstest')
+#saveSpectrumToHDF5('/tmp/', 'ccstest')

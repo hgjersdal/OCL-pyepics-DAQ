@@ -34,15 +34,18 @@ def printImageToScreen():
     plt.colorbar()
     plt.show()
 
-def saveImageToHDF5(pathname, basename):
+def imagesToHDF5(h5f, path, nImages):
+    import h5py
     grabData.caputAndCheckDict(imageToHDF5Config)
-    grabData.caputDict({
-        'CAM1:HDF1:FilePath': pathname,
-        'CAM1:HDF1:FileName': basename
-    })
-    acquireImage()
-    epics.caput('CAM1:HDF1:WriteFile', 1)
+    for n in range(nImages):
+        raw = acquireImage()
+        h5f.create_dataset( path + '/image' + str(n), data = raw)
+    grabData.setAttributes(h5f, path, 
+                           {'exposure': epics.caget('CAM1:det1:AcquireTime_RBV'),
+                            'gain': epics.caget('CAM1:det1:Gain_RBV')
+                           })
     
-setExposure(0.01, 0)
-printImageToScreen()
+
+#setExposure(0.01, 0)
+#printImageToScreen()
 #saveImageToHDF5('/tmp/', 'pytest')

@@ -23,5 +23,14 @@ def printPMVals(nValues, sleepTime):
     plt.plot(PMVals)
     plt.show()
 
-setWavelength(500)
-printPMVals(100, 0.1)
+def pmValsToHDF5(h5f, path, nVals, sleepTime):
+    import h5py
+    epics.caput('PM100:SENS:CORR:WAV_RBV.PROC', 1)
+    PMVals = getPMVals(nVals, sleepTime)
+    h5f.create_dataset( path + '/pmVals', data = PMVals)
+    grabData.setAttributes(h5f, path, 
+                           {'wavelength': epics.caget('PM100:SENS:CORR:WAV_RBV'),
+                        })
+    
+#setWavelength(500)
+#printPMVals(100, 0.1)
