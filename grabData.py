@@ -30,9 +30,12 @@ def acquireData(baseString, dataString):
         time.sleep(0.1)
     return(epics.caget( dataString ))
 
-def setAttributes(h5f, path, attributes):
+def setAttributes(h5f, path, attributes, groupP = True):
     import h5py
     group = h5f.require_group(path)
     for key,value in attributes.iteritems():
         group.attrs[key] = value
     
+def setDataWithTimestamp(h5f, path, data):
+    ds = h5f.create_dataset( path, data = data)
+    ds.attrs['timestamp'] = time.time()

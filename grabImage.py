@@ -39,7 +39,8 @@ def imagesToHDF5(h5f, path, nImages):
     grabData.caputAndCheckDict(imageToHDF5Config)
     for n in range(nImages):
         raw = acquireImage()
-        h5f.create_dataset( path + '/image' + str(n), data = raw)
+        grabData.setDataWithTimestamp(h5f, path + '/image' + str(n), raw)
+        #h5f.create_dataset( path + '/image' + str(n), data = raw)
     grabData.setAttributes(h5f, path, 
                            {'exposure': epics.caget('CAM1:det1:AcquireTime_RBV'),
                             'gain': epics.caget('CAM1:det1:Gain_RBV')

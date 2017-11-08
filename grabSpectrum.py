@@ -53,11 +53,12 @@ def spectrumToHDF5(h5f, path, nSpectra):
     grabData.caputAndCheckDict(spectrumToHDF5Config)
     for n in range(nSpectra):
         raw = acquireSpectrum()
-        h5f.create_dataset( path + '/spectrum' + str(n), data = raw[0])
+        #h5f.create_dataset( path + '/spectrum' + str(n), data = raw[0])
+        grabData.setDataWithTimestamp(h5f, path + '/spectrum' + str(n), raw[0])
     waves =  epics.caget('CCS1:det1:TlWavelengthData_RBV')
-    h5f.create_dataset( path + 'wavelengths', data = waves)
+    grabData.setDataWithTimestamp(h5f, path + '/wavelengths', waves)
     amplitudes =  epics.caget('CCS1:det1:TlAmplitudeData_RBV')
-    h5f.create_dataset( path + 'amplitudedata', data = amplitudes)
+    grabData.setDataWithTimestamp(h5f, path + '/amplitudes', amplitudes)
     grabData.setAttributes(h5f, path, 
                            {'exposure': epics.caget('CCS1:det1:AcquireTime_RBV'),
                            })

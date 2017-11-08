@@ -27,7 +27,8 @@ def pmValsToHDF5(h5f, path, nVals, sleepTime):
     import h5py
     epics.caput('PM100:SENS:CORR:WAV_RBV.PROC', 1)
     PMVals = getPMVals(nVals, sleepTime)
-    h5f.create_dataset( path + '/pmVals', data = PMVals)
+    #h5f.create_dataset( path + '/pmVals' , data = PMVals)
+    grabData.setDataWithTimestamp(h5f, path + '/pmVals', PMVals)
     grabData.setAttributes(h5f, path, 
                            {'wavelength': epics.caget('PM100:SENS:CORR:WAV_RBV'),
                         })
