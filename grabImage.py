@@ -43,7 +43,9 @@ def imagesToHDF5(h5f, path, nImages):
         #h5f.create_dataset( path + '/image' + str(n), data = raw)
     grabData.setAttributes(h5f, path, 
                            {'exposure': epics.caget('CAM1:det1:AcquireTime_RBV'),
-                            'gain': epics.caget('CAM1:det1:Gain_RBV')
+                            'gain': epics.caget('CAM1:det1:Gain_RBV'),
+                            'sizeX': epics.caget('CAM1:det1:SizeX_RBV'),
+                            'sizeY': epics.caget('CAM1:det1:SizeY_RBV')
                            })
     
 

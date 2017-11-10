@@ -1,4 +1,5 @@
 from ctypes import *
+import argparse
 import time
 import os
 import sys
@@ -45,13 +46,15 @@ def move_to (position):
     print('Now at ' + str(get_position()) )
 
 if __name__ == '__main__':
-    move_to(0)
-    move_to(5000)
-    move_to(0)
-    move_to(10000)
-    move_to(0)
+    parser = argparse.ArgumentParser(description='Check or set position of Standa stage')
+    parser.add_argument('-p','--pos', action='store_true', default=False, help="Print position")
+    parser.add_argument('-m','--move', type=int, help="Move stage to position")
+    args = parser.parse_args()
 
-
-
-
-
+    if( args.pos ): 
+        print('Position is office')
+        sys.exit(0)
+        
+    pos = args.move
+    move_to(pos)
+    sys.exit(0)
