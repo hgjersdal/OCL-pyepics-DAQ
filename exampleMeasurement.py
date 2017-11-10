@@ -1,36 +1,19 @@
 import h5py
 import numpy as np
-import grabData, grabImage, grabSpectrum, grabPMVal
+import grabData, grabImage, grabSpectrum, grabPMVal, getCurrent
 
 with h5py.File('/tmp/test-file.h5', 'w') as h5f: #set to w- to ensure no overwriting
-    path = '/meas1'
-    attributes = { 'BeamCurrent': 100, #nA
+    group = grabData.makePathname('meas1')
+    current = getCurrent.getNValues(10)
+    attributes = { 'BeamCurrent': current[0], #nA
                    'Temperature': 150, #degrees C
                    'Sample': 'HV1'
                }
-    grabData.setAttributes(h5f, path, attributes)
-    grabImage.imagesToHDF5(h5f, path + '/images', 5)
-    grabSpectrum.spectrumToHDF5(h5f, path + '/spectra', 5)
-    grabPMVal.pmValsToHDF5(h5f, path + '/PMVals', 100, 0.1)
-
-#samples={
-#     'HV1': 1001,
-#     'Chromox': 1234,
-#     'FC': 2345
-# }
-# # What a sample scan might look like
-# with h5py.File('/tmp/test-file.h5', 'w-') as h5f: #set to w- to ensure no overwriting
-#     for key, value in samples:
-#         path = '/' + key
-#         moveStage(samples['FC'])
-#         attributes = { 'Sample': key,
-#                        'BeamCurrent': getCurrent(),
-#                    }
-#         moveStage(value)
-#         grabData.setAttributes(attributes)
-#         grabImage.imagesToHDF5(h5f, path + '/images', 5)
-#         grabSpectrum.spectrumToHDF5(h5f, path + '/spectra', 5)
-
+    grabData.setDataWithTimestamp(h5f, '/meas1/currentVals', current)
+    grabData.setAttributes(h5f, group, attributes)
+    grabImage.imagesToHDF5(h5f, '/meas1/images', 5)
+    grabSpectrum.spectrumToHDF5(h5f, '/meas1/spectra', 5)
+    #grabPMVal.pmValsToHDF5(h5f, '/meas1/PMVals', 100, 0.1)
 
 # #What a heat scan might look like
 # with h5py.File('/tmp/test-file.h5', 'w-') as h5f: #set to w- to ensure no overwriting

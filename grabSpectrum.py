@@ -3,7 +3,7 @@ import grabData, time, numpy, epics
 #Spectra
 spectrumToScreenConfig = {
     'CCS1:det1:ImageMode': 0,#Single
-    'CCS1:det1:TlAcquisitionType': 1, #1 is processed, set to 0 for raw
+    'CCS1:det1:TlAcquisitionType': 0, #1 is processed, set to 0 for raw
     'CCS1:det1:TriggerMode': 0, #Internal
     'CCS1:trace1:EnableCallbacks': 1, #Enable
     'CCS1:trace1:ArrayCallbacks': 1, #Enable

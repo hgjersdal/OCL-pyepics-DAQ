@@ -52,7 +52,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if( args.pos ): 
-        print('Position is office')
+        print('Position is ' + str( get_position()) )
         sys.exit(0)
         
     pos = args.move
