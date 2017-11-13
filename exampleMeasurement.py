@@ -1,15 +1,26 @@
 import h5py
 import numpy as np
-import grabData, grabImage, grabSpectrum, grabPMVal, getCurrent
+import grabData, grabImage, grabSpectrum, grabPMVal
+from misc-epics.k24xx import K24xx
+
+# setup sourcemeter
+baud = 9600
+port = '/dev/ttyUSB0'
+timeout = 30 # communications timeout [s]
+nplc = 10 # number of power line cycles
+meanValues = 5 # number of readings to internally average
+k = K24xx(baud=baud, port=port, timeout=timeout)
+k.currentSetup(nplc=nplc, nMean=meanValues)
 
 with h5py.File('/tmp/test-file.h5', 'w') as h5f: #set to w- to ensure no overwriting
     group = grabData.makePathname('meas1')
-    current = getCurrent.getNValues(10)
-    attributes = { 'BeamCurrent': current[0], #nA
+    k.setOutput(True)
+    current = k.getCurrent()
+    k.setOutput(False)
+    attributes = { 'BeamCurrent': current, #in amps
                    'Temperature': 150, #degrees C
                    'Sample': 'HV1'
                }
-    grabData.setDataWithTimestamp(h5f, '/meas1/currentVals', current)
     grabData.setAttributes(h5f, group, attributes)
     grabImage.imagesToHDF5(h5f, '/meas1/images', 5)
     grabSpectrum.spectrumToHDF5(h5f, '/meas1/spectra', 5)

@@ -25,6 +25,15 @@ def setExposure(exposure, gain):
 def acquireImage():
     return( grabData.acquireData('CAM1:det1:', 'CAM1:image1:ArrayData') )
 
+def maxSmoothedVal(image):
+    
+
+def autoExposure(exp, gain):
+    setExposure(exposure, gain)
+    sizeX = epics.caget('CAM1:det1:SizeX_RBV')
+    sizeY = epics.caget('CAM1:det1:SizeY_RBV')
+    while
+
 def printImageToScreen():
     grabData.caputAndCheckDict(imageOnScreenConfig)
     raw = acquireImage()
