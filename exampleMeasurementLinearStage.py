@@ -1,7 +1,7 @@
 import h5py
 import numpy as np
 import grabData, grabImage, grabSpectrum, grabPMVal, moveStage
-from misc-epics.k24xx import K24xx
+from misc_ess.k24xx import K24xx
 
 samples={
     'HV1': 10000,
@@ -23,9 +23,9 @@ with h5py.File('/tmp/test-stage.h5', 'w-') as h5f: #set to w- to ensure no overw
         group = grabData.makePathname(sample) #Store in group names after sample
         print('Sample ' + group)
         moveStage.move_to(samples['FC'])
-        k.setOutout(True) # turn the sourcemeter on
+        k.setOutput(True) # turn the sourcemeter on
         current = k.getCurrent()
-        k.setOutout(False) # turn the sourcemeter off
+        k.setOutput(False) # turn the sourcemeter off
         dsname = grabData.makePathname(sample, None, 'currentvals')
 
         moveStage.move_to(pos)

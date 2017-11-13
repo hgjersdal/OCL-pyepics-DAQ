@@ -1,7 +1,7 @@
 import h5py
 import numpy as np
 import grabData, grabImage, grabSpectrum, grabPMVal
-from misc-epics.k24xx import K24xx
+from misc_ess.k24xx import K24xx
 
 # setup sourcemeter
 baud = 9600
