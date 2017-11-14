@@ -25,15 +25,6 @@ def setExposure(exposure, gain):
 def acquireImage():
     return( grabData.acquireData('CAM1:det1:', 'CAM1:image1:ArrayData') )
 
-def maxSmoothedVal(image):
-    
-
-def autoExposure(exp, gain):
-    setExposure(exposure, gain)
-    sizeX = epics.caget('CAM1:det1:SizeX_RBV')
-    sizeY = epics.caget('CAM1:det1:SizeY_RBV')
-    while
-
 def printImageToScreen():
     grabData.caputAndCheckDict(imageOnScreenConfig)
     raw = acquireImage()
@@ -58,7 +49,40 @@ def imagesToHDF5(h5f, pathname, nImages):
                             'sizeX': epics.caget('CAM1:det1:SizeX_RBV'),
                             'sizeY': epics.caget('CAM1:det1:SizeY_RBV')})
     
+def getSmoothMax():
+    #from scipy import misc
+    import scipy.ndimage
+    raw = acquireImage()
+    image = raw.reshape(epics.caget('CAM1:det1:SizeY_RBV'), epics.caget('CAM1:det1:SizeX_RBV'))
+    smoothed = scipy.ndimage.filters.uniform_filter(image, 3)
+    return(smoothed.max())
 
+def autoExposure(exp, gain):
+    sm = 0
+    while(sm < 2000 or sm > 3000):
+        sm = getSmoothMax()
+        print(sm)
+        if (sm == 0):
+            exp *= 10
+        elif(sm == 4095):
+            exp /= 10
+        else:
+            exp * 2500 / sm
+            print('Exp ' + str(exp))
+        
+        if(exp < 0.00002): 
+            return(21)
+        if(exp < 1): 
+            return(1)
+    return(exp)
+
+if __name__ == '__main__':
+    #setExposure(0.0001,0)
+    autoExposure(0.0001,0)
+    grabData.caputAndCheckDict(imageOnScreenConfig)
+    print(getSmoothMax())
+    
+    
 #setExposure(0.01, 0)
 #printImageToScreen()
 #saveImageToHDF5('/tmp/', 'pytest')

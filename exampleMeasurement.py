@@ -5,7 +5,7 @@ from misc_ess.k24xx import K24xx
 
 # setup sourcemeter
 baud = 9600
-port = '/dev/ttyUSB0'
+port = '/dev/ttyUSB1'
 timeout = 30 # communications timeout [s]
 nplc = 10 # number of power line cycles
 meanValues = 5 # number of readings to internally average
