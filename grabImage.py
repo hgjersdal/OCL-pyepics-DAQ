@@ -1,5 +1,6 @@
 import grabData, time, numpy, epics
 
+
 imageOnScreenConfig = {
     'CAM1:image1:EnableCallbacks': 1,#Enable
     'CAM1:image1:ArrayCallbacks': 1, #Enable
@@ -48,37 +49,46 @@ def imagesToHDF5(h5f, pathname, nImages):
                             'gain': epics.caget('CAM1:det1:Gain_RBV'),
                             'sizeX': epics.caget('CAM1:det1:SizeX_RBV'),
                             'sizeY': epics.caget('CAM1:det1:SizeY_RBV')})
-    
+
 def getSmoothMax():
     #from scipy import misc
     import scipy.ndimage
     raw = acquireImage()
     image = raw.reshape(epics.caget('CAM1:det1:SizeY_RBV'), epics.caget('CAM1:det1:SizeX_RBV'))
-    smoothed = scipy.ndimage.filters.uniform_filter(image, 3)
+    smoothed = scipy.ndimage.filters.median_filter(image, 9)
+    import matplotlib.pyplot as plt
+    plt.matshow(smoothed)
+    plt.colorbar()
+    plt.show()
+    
     return(smoothed.max())
 
-def autoExposure(exp, gain):
-    sm = 0
-    while(sm < 2000 or sm > 3000):
+def autoExposure():
+    grabData.caputAndCheckDict(imageToHDF5Config)
+
+    gain = epics.caget('CAM1:det1:Gain_RBV')
+    datatype = 12
+    max_image = 2**datatype
+    while(True):
         sm = getSmoothMax()
-        print(sm)
-        if (sm == 0):
-            exp *= 10
-        elif(sm == 4095):
-            exp /= 10
+        exp = epics.caget('CAM1:det1:AcquireTime_RBV')
+        print('Smoothed max is: ' + str(sm) + ' out of ' + str(max_image))
+        autoset = exp * (max_image *  0.5)/sm
+        if(autoset > 1.0):
+            setExposure(1.0, gain)
+            return(1.0)
+        if(autoset < 0.0001):
+            setExposure(0.001, gain)
+            return(0.0001)
+        if( (sm < max_image * 0.4) or ( sm > max_image * 0.6)):
+            epics.caput('CAM1:det1:AcquireTime', autoset)
         else:
-            exp * 2500 / sm
-            print('Exp ' + str(exp))
-        
-        if(exp < 0.00002): 
-            return(21)
-        if(exp < 1): 
-            return(1)
-    return(exp)
+            epics.caput('CAM1:det1:AcquireTime', autoset)
+            break
 
 if __name__ == '__main__':
-    #setExposure(0.0001,0)
-    autoExposure(0.0001,0)
+    setExposure(0.001,0)
+    autoExposure()
     grabData.caputAndCheckDict(imageOnScreenConfig)
     print(getSmoothMax())
     

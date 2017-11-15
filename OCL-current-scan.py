@@ -29,7 +29,38 @@ meanValues = 15 # number of readings to internally average
 k = K24xx(baud=baud, port=port, timeout=timeout)
 k.currentSetup(nplc=nplc, nMean=meanValues)
 
-with h5py.File('/var/data/ocl/2017-11-14-OCL-currentscan2-100nA.h5', 'w') as h5f: #set to w- to ensure no overwriting
+# with h5py.File('/var/data/ocl/2017-11-15-OCL-currentscan2-100nA.h5', 'w') as h5f: #set to w- to ensure no overwriting
+#     for sample, pos in samples.iteritems():
+#         group = grabData.makePathname(sample) #Store in group names after sample
+#         print('Sample ' + group)
+#         moveStage.move_to(samples['FC'])
+#         k.setOutput(True) # turn the sourcemeter on
+#         current = k.getCurrent()
+#         k.setOutput(False) # turn the sourcemeter off
+#         dsname = grabData.makePathname(sample, None, 'currentvals')
+
+#         moveStage.move_to(pos)
+#         attributes = { 'Sample': sample,
+#                        'Position': pos,
+#                        'CameraDistance': 1170,
+#                        'BeamCurrent': current}
+#         grabData.setAttributes(h5f, group, attributes)
+#         grabImage.autoExposure()
+#         subgroup = grabData.makePathname(group, 'images_exAuto')
+#         grabImage.imagesToHDF5(h5f, subgroup, 10)
+#         for expval in [0.001,0.01,.1]:
+#             grabImage.setExposure(expval, 0)
+#             subgroup = grabData.makePathname(group, 'images_ex' + str(expval))
+#             grabImage.imagesToHDF5(h5f, subgroup, 10)
+#         for expval in [0.05,0.2, 0.5, 1]:
+#             grabSpectrum.setExposure(expval)
+#             subgroup = grabData.makePathname(group, 'spectrum_ex' + str(expval))
+#             grabSpectrum.spectrumToHDF5(h5f, subgroup, 10)
+#   moveStage.move_to(samples['FC'])
+
+
+
+with h5py.File('/var/data/ocl/2017-11-15-OCL-currentscan2-300nA.h5', 'w') as h5f: #set to w- to ensure no overwriting
     for sample, pos in samples.iteritems():
         group = grabData.makePathname(sample) #Store in group names after sample
         print('Sample ' + group)
@@ -42,22 +73,24 @@ with h5py.File('/var/data/ocl/2017-11-14-OCL-currentscan2-100nA.h5', 'w') as h5f
         moveStage.move_to(pos)
         attributes = { 'Sample': sample,
                        'Position': pos,
+                       'CameraDistance': 1170,
                        'BeamCurrent': current}
         grabData.setAttributes(h5f, group, attributes)
-        for expval in [0.0002, 0.0005, 0.001, 0.01,.1]:
+        grabImage.autoExposure()
+        subgroup = grabData.makePathname(group, 'images_exAuto')
+        grabImage.imagesToHDF5(h5f, subgroup, 10)
+        for expval in [0.001,0.01,.1]:
             grabImage.setExposure(expval, 0)
             subgroup = grabData.makePathname(group, 'images_ex' + str(expval))
             grabImage.imagesToHDF5(h5f, subgroup, 10)
-        for expval in [0.005, 0.01,0.1, 1]:
+        for expval in [0.05,0.2, 0.5, 1]:
             grabSpectrum.setExposure(expval)
             subgroup = grabData.makePathname(group, 'spectrum_ex' + str(expval))
             grabSpectrum.spectrumToHDF5(h5f, subgroup, 10)
-        if( sample == 'Yttria'):
-            grabSpectrum.setExposure(10)
-            subgroup = grabData.makePathname(group, 'spectrum_ex10')
-            grabSpectrum.spectrumToHDF5(h5f, subgroup, 5)
+    moveStage.move_to(samples['FC'])
 
-# with h5py.File('/var/data/ocl/2017-11-14-OCL-currentscan2-300nA.h5', 'w-') as h5f: #set to w- to ensure no overwriting
+
+# with h5py.File('/var/data/ocl/2017-11-15-OCL-currentscan2-600nA.h5', 'w-') as h5f: #set to w- to ensure no overwriting
 #     for sample, pos in samples.iteritems():
 #         group = grabData.makePathname(sample) #Store in group names after sample
 #         print('Sample ' + group)
@@ -70,34 +103,7 @@ with h5py.File('/var/data/ocl/2017-11-14-OCL-currentscan2-100nA.h5', 'w') as h5f
 #         moveStage.move_to(pos)
 #         attributes = { 'Sample': sample,
 #                        'Position': pos,
-#                        'BeamCurrent': current}
-#         grabData.setAttributes(h5f, group, attributes)
-#         for expval in [0.0002, 0.0005, 0.001, 0.01,.1,1.0]:
-#             grabImage.setExposure(expval, 0)
-#             subgroup = grabData.makePathname(group, 'images_ex' + str(expval))
-#             grabImage.imagesToHDF5(h5f, subgroup, 10)
-#         for expval in [0.005, 0.01,0.1, 1]:
-#             grabSpectrum.setExposure(expval)
-#             subgroup = grabData.makePathname(group, 'spectrum_ex' + str(expval))
-#             grabSpectrum.spectrumToHDF5(h5f, subgroup, 10)
-#         if( sample == 'Yttria'):
-#             grabSpectrum.setExposure(10)
-#             subgroup = grabData.makePathname(group, 'spectrum_ex10')
-#             grabSpectrum.spectrumToHDF5(h5f, subgroup, 5)
-
-# with h5py.File('/var/data/ocl/2017-11-14-OCL-currentscan2-600nA.h5', 'w-') as h5f: #set to w- to ensure no overwriting
-#     for sample, pos in samples.iteritems():
-#         group = grabData.makePathname(sample) #Store in group names after sample
-#         print('Sample ' + group)
-#         moveStage.move_to(samples['FC'])
-#         k.setOutput(True) # turn the sourcemeter on
-#         current = k.getCurrent()
-#         k.setOutput(False) # turn the sourcemeter off
-#         dsname = grabData.makePathname(sample, None, 'currentvals')
-
-#         moveStage.move_to(pos)
-#         attributes = { 'Sample': sample,
-#                        'Position': pos,
+#                        'CameraDistance': 1170,
 #                        'BeamCurrent': current}
 #         grabData.setAttributes(h5f, group, attributes)
 #         for expval in [0.0002, 0.0005, 0.001, 0.01,.1,1.0]:
