@@ -1,37 +1,43 @@
 import h5py
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 
-def visitFunction(name, obj):
+def visitFunction(name, obj, plotp, match):
     print(name)
     for key, val in obj.attrs.iteritems():
         print( '    ' + str(key) + ': ' + str(val) )
-    # if(type(obj) == h5py._hl.dataset.Dataset):
-    #     if(obj.len() > 100000):
-    #         print('I hope this is an image!')
-    #         raw = obj[:].reshape(964, 1292)
-    #         import matplotlib.pyplot as plt
-    #         plt.matshow(raw)
-    #         plt.colorbar()
-    #         plt.show()        
-    #     if(obj.len() < 100000 and obj.len()>3599):
-    #         print('I hope this is a spectrum!')
-    #         raw = obj[:]
-    #         import matplotlib.pyplot as plt
-    #         plt.plot(raw[0:3600])
-    #         plt.show()        
-    #     if(obj.len() < 3599):
-    #         print('Power or current scan?')
-    #         raw = obj[:]
-    #         import matplotlib.pyplot as plt
-    #         plt.plot(raw)
-    #         plt.show()        
+    matching = True
+    if( isinstance(match, basestring) and 
+        name.find(match) == -1):
+        matching = False
+    if(type(obj) == h5py._hl.dataset.Dataset  and
+       matching and 
+       plotp):
+        if(obj.len() > 100000):
+            raw = obj[:].reshape(964, 1292)
+            plt.matshow(raw)
+            plt.colorbar()
+            plt.show()        
+        if(obj.len() < 100000 and obj.len()>3599):
+            raw = obj[:]
+            plt.plot(raw[0:3600])
+            plt.show()        
+        if(obj.len() < 3599):
+            raw = obj[:]
+            plt.plot(raw)
+            plt.show()        
 
-    
-#x = 1292, y = 964
+import argparse
 
-if( len(sys.argv)!= 2 ):
-    print("Call program with one argument, the hdf5 file")
+parser = argparse.ArgumentParser(description='List contents of HDF5 file. ')
+parser.add_argument('filename')
+parser.add_argument('-p','--plot', action='store_true', default=False, help="Plot data")
+parser.add_argument('-m','--match', default=None, help="Print things where the full pathname contains MATCH")
+args = parser.parse_args()
 
-with h5py.File(sys.argv[1],'r') as f:
-    f.visititems(visitFunction)
+if(args.match):
+    args.plot = True
+
+with h5py.File(args.filename,'r') as f:
+    f.visititems(lambda obj, name: visitFunction(obj, name, args.plot, args.match))
