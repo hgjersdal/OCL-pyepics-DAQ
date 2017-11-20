@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 
 def visitFunction(name, obj, plotp, match):
     print(name)
-    for key, val in obj.attrs.iteritems():
+    for key, val in obj.attrs.items():
         print( '    ' + str(key) + ': ' + str(val) )
     matching = True
-    if( isinstance(match, basestring) and 
+    if( isinstance(match, str) and 
         name.find(match) == -1):
         matching = False
     if(type(obj) == h5py._hl.dataset.Dataset  and

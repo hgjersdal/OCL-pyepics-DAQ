@@ -12,13 +12,13 @@ if(supressEpicsWarings):
     epics.ca.replace_printf_handler(handleMessages)
 
 def caputDict(dict):
-    for key, value in dict.iteritems():
+    for key, value in dict.items():
         epics.caput(key, value)
         
 def caputAndCheckDict(dict):
     caputDict(dict)
     time.sleep(1)
-    for key, value in dict.iteritems():
+    for key, value in dict.items():
         rbv = epics.caget(key + '_RBV')
         if( (type(rbv) != numpy.ndarray ) and (rbv != value) ):
             warnings.warn( key + " is set to " + str(value) + ", but RBV is " + str(rbv))
@@ -33,7 +33,7 @@ def acquireData(baseString, dataString):
 def setAttributes(h5f, pathname, attributes):
     import h5py
     group = h5f.require_group(pathname)
-    for key,value in attributes.iteritems():
+    for key,value in attributes.items():
         group.attrs[key] = value
     
 def setDataWithTimestamp(h5f, pathname, data):
